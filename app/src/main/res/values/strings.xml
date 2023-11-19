@@ -24,6 +24,9 @@
     <string name="alarm_missed_text"><xliff:g id="alarm_time">%1$s</xliff:g> - <xliff:g id="alarm_label">%2$s</xliff:g></string>
     <string name="alarm_tomorrow">Tomorrow</string>
     <string name="alarm_today">Today</string>
+    <string name="silent_ringtone_title">Silent</string>
+    <string name="unknown_ringtone_title">Unknown</string>
+    <string name="default_alarm_ringtone_title">Default alarm sound</string>
     <plurals name="alarm_alert_snooze_set">
         <!-- Duration for one minute -->
         <item quantity="one">Snoozing for 1 minute.</item>
@@ -34,7 +37,7 @@
         <!-- Duration for one day -->
         <item quantity="one">1 day</item>
         <!-- Duration for more than one day -->
-        <item quantity="other"><xliff:g id="number" example="7">%s</xliff:g> days</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> days</item>
     </plurals>
 
     <!-- Alarm confirmation toast, timer notification and world clock ahead/behind: hours -->
@@ -42,14 +45,14 @@
         <!-- Duration for one hour -->
         <item quantity="one">1 hour</item>
         <!-- Duration for more than one hour -->
-        <item quantity="other"><xliff:g id="number" example="7">%s</xliff:g> hours</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> hours</item>
     </plurals>
 
     <plurals name="hours_short">
         <!-- Duration for one hour [CHAR LIMIT=8] -->
         <item quantity="one">1 hr</item>
         <!-- Duration for more than one hour [CHAR LIMIT=8]-->
-        <item quantity="other"><xliff:g id="number" example="7">%s</xliff:g> hr</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> hr</item>
     </plurals>
 
     <!-- Alarm confirmation toast and timer notification: minutes -->
@@ -57,14 +60,14 @@
         <!-- Duration for one minute -->
         <item quantity="one">1 minute</item>
         <!-- Duration for more than one minute -->
-        <item quantity="other"><xliff:g id="number" example="7">%s</xliff:g> minutes</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> minutes</item>
     </plurals>
 
     <plurals name="minutes_short">
         <!-- Duration for one minute [CHAR LIMIT=8] -->
         <item quantity="one">1 min</item>
         <!-- Duration for more than one minute [CHAR LIMIT=8] -->
-        <item quantity="other"><xliff:g id="number" example="7">%s</xliff:g> min</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> min</item>
     </plurals>
 
     <!-- Timer accessibility announcement -->
@@ -72,6 +75,6 @@
         <!-- Duration for one second -->
         <item quantity="one">1 second</item>
         <!-- Duration for more than one minute -->
-        <item quantity="other"><xliff:g id="number" example="7">%s</xliff:g> seconds</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> seconds</item>
     </plurals>
 </resources>

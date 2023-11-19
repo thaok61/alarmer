@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.thao_soft.alarmer.AlarmFullScreenActivity
 import com.thao_soft.alarmer.MainActivity
 import com.thao_soft.alarmer.R
 import com.thao_soft.alarmer.data.InstancesColumns
@@ -53,7 +54,7 @@ internal object AlarmNotifications {
             AlarmStateManager.ALARM_SNOOZE_TAG, instance, InstancesColumns.SNOOZE_STATE
         )
         snoozeIntent.putExtra(AlarmStateManager.FROM_NOTIFICATION_EXTRA, true)
-        val snoozePendingIntent: PendingIntent = PendingIntent.getService(
+        val snoozePendingIntent: PendingIntent = PendingIntent.getForegroundService(
             service,
             ALARM_FIRING_NOTIFICATION_ID,
             snoozeIntent,
@@ -70,7 +71,7 @@ internal object AlarmNotifications {
             AlarmStateManager.ALARM_DISMISS_TAG, instance, InstancesColumns.DISMISSED_STATE
         )
         dismissIntent.putExtra(AlarmStateManager.FROM_NOTIFICATION_EXTRA, true)
-        val dismissPendingIntent: PendingIntent = PendingIntent.getService(
+        val dismissPendingIntent: PendingIntent = PendingIntent.getForegroundService(
             service,
             ALARM_FIRING_NOTIFICATION_ID,
             dismissIntent,
@@ -98,7 +99,7 @@ internal object AlarmNotifications {
 
         // Setup fullscreen intent
         val fullScreenIntent: Intent =
-            AlarmInstance.createIntent(service, MainActivity::class.java, instance.id)
+            AlarmInstance.createIntent(service, AlarmFullScreenActivity::class.java, instance.id)
         // set action, so we can be different then content pending intent
         fullScreenIntent.action = "fullscreen_activity"
         fullScreenIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -255,7 +256,7 @@ internal object AlarmNotifications {
         Log.d(TAG, "showHighPriorityNotification: $id")
         builder.addAction(R.drawable.ic_alarm_off_24dp,
             context.getString(R.string.alarm_alert_dismiss_text),
-            PendingIntent.getService(context, id,
+            PendingIntent.getForegroundService(context, id,
                 dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
 
         // Setup content action if instance is owned by alarm
@@ -351,7 +352,7 @@ internal object AlarmNotifications {
         Log.d(TAG, "showSnoozeNotification: $id")
         builder.addAction(R.drawable.ic_alarm_off_24dp,
             context.getString(R.string.alarm_alert_dismiss_text),
-            PendingIntent.getService(context, id,
+            PendingIntent.getForegroundService(context, id,
                 dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
 
         // Setup content action if instance is owned by alarm
@@ -404,7 +405,7 @@ internal object AlarmNotifications {
             InstancesColumns.HIDE_NOTIFICATION_STATE)
         val id = instance.hashCode()
         Log.d(TAG, "showLowPriorityNotification: $id")
-        builder.setDeleteIntent(PendingIntent.getService(context, id,
+        builder.setDeleteIntent(PendingIntent.getForegroundService(context, id,
             hideIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
 
         // Setup up dismiss action
@@ -412,7 +413,7 @@ internal object AlarmNotifications {
             AlarmStateManager.ALARM_DISMISS_TAG, instance, InstancesColumns.PREDISMISSED_STATE)
         builder.addAction(R.drawable.ic_alarm_off_24dp,
             context.getString(R.string.alarm_alert_dismiss_text),
-            PendingIntent.getService(context, id,
+            PendingIntent.getForegroundService(context, id,
                 dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
 
         // Setup content action if instance is owned by alarm
@@ -467,7 +468,7 @@ internal object AlarmNotifications {
         // Setup dismiss intent
         val dismissIntent: Intent = AlarmStateManager.createStateChangeIntent(context,
             AlarmStateManager.ALARM_DISMISS_TAG, instance, InstancesColumns.DISMISSED_STATE)
-        builder.setDeleteIntent(PendingIntent.getService(context, id,
+        builder.setDeleteIntent(PendingIntent.getForegroundService(context, id,
             dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
 
         // Setup content intent
@@ -565,6 +566,6 @@ internal object AlarmNotifications {
      * This value is coordinated with notification ids from
      * [com.thao.deskclock.data.NotificationModel]
      */
-    private const val ALARM_FIRING_NOTIFICATION_ID = Int.MAX_VALUE - 7
+    const val ALARM_FIRING_NOTIFICATION_ID = Int.MAX_VALUE - 7
 
 }

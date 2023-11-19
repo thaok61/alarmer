@@ -9,7 +9,15 @@ class SettingsModel(
     private val mPrefs: SharedPreferences,
     private val mTimeModel: TimeModel
 ) {
+    fun updateGlobalIntentId() {
+        SettingsDAO.updateGlobalIntentId(mPrefs)
+    }
 
+    var isRestoreBackupFinished: Boolean
+        get() = SettingsDAO.isRestoreBackupFinished(mPrefs)
+        set(finished) {
+            SettingsDAO.setRestoreBackupFinished(mPrefs, finished)
+        }
     val weekdayOrder: Weekdays.Order
         get() = SettingsDAO.getWeekdayOrder(mPrefs)
 

@@ -22,23 +22,43 @@ import java.util.Calendar
 
 class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
-         val TAG: String = AlarmViewModel::class.java.simpleName
+        val TAG: String = AlarmViewModel::class.java.simpleName
     }
+
     private val _uiState = MutableStateFlow(AlarmUiState())
     val uiState: StateFlow<AlarmUiState> = _uiState.asStateFlow()
     private val context = getApplication<Application>()
     private val cr: ContentResolver = getApplication<Application>().contentResolver
     private var mDeletedAlarm: Alarm? = null
 
-    init {
-        getAllAlarms()
-    }
 
-
-    private fun getAllAlarms() {
+    fun getAllAlarms() {
         viewModelScope.launch(Dispatchers.IO) {
+            DataModel.dataModel.loadRingtoneTitles()
+            DataModel.dataModel.loadRingtonePermissions()
             val alarms = AlarmAndAlarmInstance.getAlarms(cr)
-            _uiState.value = AlarmUiState(alarms)
+
+
+            _uiState.update {state ->
+                if (state.selectedAlarmAndAlarmInstance == null) {
+                    state.copy(
+                        alarmAndInstances = alarms
+                    )
+                } else {
+                    val alarmId = state.selectedAlarmAndAlarmInstance.alarm.id
+                    var newSelected: AlarmAndAlarmInstance? = null;
+                    for (i in 0 until alarms.size) {
+                        if (alarms[i].alarm.id == alarmId) {
+                            newSelected = alarms[i]
+                        }
+                    }
+                    state.copy(
+                        alarmAndInstances = alarms,
+                        selectedAlarmAndAlarmInstance = newSelected
+                    )
+                }
+
+            }
         }
     }
 
@@ -57,7 +77,8 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
             val newAlarmAndInstances = state.alarmAndInstances.toMutableList()
             val itemAlarm = newAlarmAndInstances[index].alarm
             val newAlarm = createAlarm(itemAlarm)
-            val shouldUpdateSelectedAlarm = state.selectedAlarmAndAlarmInstance == newAlarmAndInstances[index]
+            val shouldUpdateSelectedAlarm =
+                state.selectedAlarmAndAlarmInstance == newAlarmAndInstances[index]
             newAlarmAndInstances[index] = newAlarmAndInstances[index].copy(
                 alarm = newAlarm
             )
@@ -109,6 +130,22 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateAlarmLabel(alarmIdx: Int, label: String) {
+        enableWhenAlarmChange(alarmIdx) { alarm ->
+            val newAlarm = alarm.copy(
+                label = label
+            )
+            updateAlarm(newAlarm, popToast = false, minorUpdate = true)
+            newAlarm
+        }
+    }
+
+    fun setSelectedIdx(index: Int) {
+        _uiState.update {
+            it.copy(selectedIdx = index)
+        }
+    }
+
     private fun updateAlarm(alarm: Alarm, popToast: Boolean, minorUpdate: Boolean) {
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -153,22 +190,33 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
         val cr: ContentResolver = context.contentResolver
         var newInstance = alarm.createInstanceAfter(Calendar.getInstance())
         Log.d(TAG, "setupAlarmInstance: newInstance: ${newInstance.alarmTime.time}")
-        Log.d(TAG, "setupAlarmInstance: alarm: ${alarm}")
+        Log.d(TAG, "setupAlarmInstance: alarm: $alarm")
         newInstance = AlarmInstance.addInstance(cr, newInstance)
         // Register instance to state manager
         AlarmStateManager.registerInstance(context, newInstance, true)
         return newInstance
     }
 
+    fun changeTimePickerState(index: Int) {
+
+        _uiState.update { state ->
+            state.copy(
+                selectedIdx = index,
+                showTimePicker = !state.showTimePicker
+            )
+        }
+    }
+
     fun onTimeSet(
         hourOfDay: Int,
         minute: Int,
-        selectedAlarmAndAlarmInstance: AlarmAndAlarmInstance? = null
+        selectedIdx: Int = -1
     ) {
         Log.d(TAG, "onTimeSet: hour: $hourOfDay, minute: $minute")
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { state ->
-                if (selectedAlarmAndAlarmInstance == null) {
+            if (selectedIdx == -1) {
+                _uiState.update { state ->
+
                     // If mSelectedAlarm is null then we're creating a new alarm.
                     val a = withContext(Dispatchers.Main) {
                         Alarm.constructorHelper(hourOfDay, minute)
@@ -185,18 +233,21 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
                     state.copy(
                         alarmAndInstances = newAlarmAndInstances
                     )
-                } else {
-                    selectedAlarmAndAlarmInstance.alarm.hour = hourOfDay
-                    selectedAlarmAndAlarmInstance.alarm.minutes = minute
-                    selectedAlarmAndAlarmInstance.alarm.enabled = true
+                }
+            } else {
+                enableWhenAlarmChange(selectedIdx) { alarm ->
+
+                    val newAlarm = alarm.copy(
+                        hour = hourOfDay,
+                        minutes = minute,
+                        enabled = true
+                    )
                     updateAlarm(
-                        selectedAlarmAndAlarmInstance.alarm,
+                        newAlarm,
                         popToast = true,
                         minorUpdate = false
                     )
-                    state.copy(
-                        selectedAlarmAndAlarmInstance = null
-                    )
+                    newAlarm
                 }
             }
         }

@@ -95,6 +95,7 @@ object Utils {
         return context.resources.getQuantityString(id, quantity, localizedQuantity)
     }
 
+    val RINGTONE_SILENT: Uri = Uri.EMPTY
     val isLOrLater: Boolean
         get() = true
 

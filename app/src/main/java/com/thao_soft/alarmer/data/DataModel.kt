@@ -21,6 +21,17 @@ class DataModel {
             get() = sDataModel
     }
 
+    var isRestoreBackupFinished: Boolean
+        /**
+         * @return `true` if the restore process (of backup and restore) has completed
+         */
+        get() = mSettingsModel!!.isRestoreBackupFinished
+        /**
+         * @param finished `true` means the restore process (of backup and restore) has completed
+         */
+        set(finished) {
+            mSettingsModel!!.isRestoreBackupFinished = finished
+        }
     val weekdayOrder: Weekdays.Order
         get() {
             Utils.enforceMainLooper()
@@ -78,6 +89,7 @@ class DataModel {
         if (mContext !== context) {
             mContext = context.applicationContext
             mTimeModel = TimeModel(mContext!!)
+            mRingtoneModel = RingtoneModel(mContext!!, prefs)
             mSettingsModel = SettingsModel(mContext!!, prefs, mTimeModel!!)
             mAlarmModel = AlarmModel(mContext!!, mSettingsModel!!)
         }
@@ -94,5 +106,20 @@ class DataModel {
 
     fun is24HourFormat(): Boolean {
         return mTimeModel!!.is24HourFormat()
+    }
+
+    fun getRingtoneTitle(uri: Uri): String? {
+        Utils.enforceMainLooper()
+        return mRingtoneModel?.getRingtoneTitle(uri)
+    }
+
+    fun loadRingtonePermissions() {
+        Utils.enforceNotMainLooper()
+        mRingtoneModel?.loadRingtonePermissions()
+    }
+
+    fun updateGlobalIntentId() {
+        Utils.enforceMainLooper()
+        mSettingsModel!!.updateGlobalIntentId()
     }
 }

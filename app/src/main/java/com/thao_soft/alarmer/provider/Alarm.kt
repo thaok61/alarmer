@@ -22,6 +22,7 @@ import com.thao_soft.alarmer.data.Weekdays
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar
+import java.util.LinkedList
 
 @Entity(tableName = ClockDatabaseHelper.ALARMS_TABLE_NAME)
 @TypeConverters(WeekdaysConverter::class, UriTypeConverter::class)
@@ -98,6 +99,25 @@ data class Alarm(
         nextInstanceTime[Calendar.MINUTE] = minutes
 
         return nextInstanceTime
+    }
+
+    fun getPreviousAlarmTime(currentTime: Calendar): Calendar? {
+        val previousInstanceTime = Calendar.getInstance(currentTime.timeZone)
+        previousInstanceTime[Calendar.YEAR] = currentTime[Calendar.YEAR]
+        previousInstanceTime[Calendar.MONTH] = currentTime[Calendar.MONTH]
+        previousInstanceTime[Calendar.DAY_OF_MONTH] = currentTime[Calendar.DAY_OF_MONTH]
+        previousInstanceTime[Calendar.HOUR_OF_DAY] = hour
+        previousInstanceTime[Calendar.MINUTE] = minutes
+        previousInstanceTime[Calendar.SECOND] = 0
+        previousInstanceTime[Calendar.MILLISECOND] = 0
+
+        val subtractDays = daysOfWeek.getDistanceToPreviousDay(previousInstanceTime)
+        return if (subtractDays > 0) {
+            previousInstanceTime.add(Calendar.DAY_OF_WEEK, -subtractDays)
+            previousInstanceTime
+        } else {
+            null
+        }
     }
 
     companion object {
@@ -228,6 +248,27 @@ data class Alarm(
             }
 
         }
+
+        fun getAlarms(
+            cr: ContentResolver,
+            selection: String?,
+            vararg selectionArgs: String?
+        ): List<Alarm> {
+            val result: MutableList<Alarm> = LinkedList()
+            val cursor: Cursor? =
+                cr.query(AlarmsColumns.CONTENT_URI, QUERY_COLUMNS,
+                    selection, selectionArgs, null)
+            cursor?.let {
+                if (cursor.moveToFirst()) {
+                    do {
+                        result.add(constructorHelper(cursor))
+                    } while (cursor.moveToNext())
+                }
+            }
+
+            return result
+        }
+
         val TAG: String = Alarm::class.java.simpleName
 
         const val INVALID_ID: Long = -1

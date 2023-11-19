@@ -11,6 +11,7 @@ import java.util.Calendar
 object SettingsDAO {
     private const val KEY_DEFAULT_ALARM_RINGTONE_URI = "default_alarm_ringtone_uri"
     private const val KEY_ALARM_GLOBAL_ID = "intent.extra.alarm.global.id"
+    private const val KEY_RESTORE_BACKUP_FINISHED = "restore_finished"
 
     fun getAlarmCrescendoDuration(prefs: SharedPreferences): Long {
         val crescendoSeconds: String = prefs.getString(Constants.KEY_ALARM_CRESCENDO, "0")!!
@@ -64,6 +65,23 @@ object SettingsDAO {
             Calendar.SUNDAY -> Order.SUN_TO_SAT
             Calendar.MONDAY -> Order.MON_TO_SUN
             else -> throw IllegalArgumentException("Unknown weekday: $firstCalendarDay")
+        }
+    }
+
+    fun updateGlobalIntentId(prefs: SharedPreferences) {
+        val globalId: Int = prefs.getInt(KEY_ALARM_GLOBAL_ID, -1) + 1
+        prefs.edit().putInt(KEY_ALARM_GLOBAL_ID, globalId).apply()
+    }
+
+    fun isRestoreBackupFinished(prefs: SharedPreferences): Boolean {
+        return prefs.getBoolean(KEY_RESTORE_BACKUP_FINISHED, false)
+    }
+
+    fun setRestoreBackupFinished(prefs: SharedPreferences, finished: Boolean) {
+        if (finished) {
+            prefs.edit().putBoolean(KEY_RESTORE_BACKUP_FINISHED, true).apply()
+        } else {
+            prefs.edit().remove(KEY_RESTORE_BACKUP_FINISHED).apply()
         }
     }
 }

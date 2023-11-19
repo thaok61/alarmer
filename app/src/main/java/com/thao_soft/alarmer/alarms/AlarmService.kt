@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
@@ -213,8 +214,9 @@ class AlarmService : Service() {
             }
 
             if (state != TelephonyManager.CALL_STATE_IDLE && state != mPhoneCallState) {
-                startService(AlarmStateManager.createStateChangeIntent(this@AlarmService,
-                    "AlarmService", mCurrentAlarm!!, InstancesColumns.MISSED_STATE))
+                val intent = AlarmStateManager.createStateChangeIntent(this@AlarmService,
+                    "AlarmService", mCurrentAlarm!!, InstancesColumns.MISSED_STATE)
+                startForegroundService(intent)
             }
         }
     }

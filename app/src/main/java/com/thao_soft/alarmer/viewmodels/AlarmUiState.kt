@@ -5,5 +5,7 @@ import com.thao_soft.alarmer.provider.AlarmAndAlarmInstance
 data class AlarmUiState(
     val alarmAndInstances: List<AlarmAndAlarmInstance> = mutableListOf(),
     val showSnackBar: Boolean = false,
-    val selectedAlarmAndAlarmInstance: AlarmAndAlarmInstance? = null
+    val selectedAlarmAndAlarmInstance: AlarmAndAlarmInstance? = null,
+    val selectedIdx: Int = -1,
+    val showTimePicker: Boolean = false
 )

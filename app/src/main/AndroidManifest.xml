@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -22,6 +24,10 @@
         android:theme="@style/Theme.Alarmer"
         tools:targetApi="31">
         <activity
+            android:name=".AlarmFullScreenActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Alarmer"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Alarmer">
@@ -33,22 +39,36 @@
         </activity>
 
         <provider
-            android:authorities="com.thao_soft.alarmer"
             android:name=".provider.ClockProvider"
+            android:authorities="com.thao_soft.alarmer"
             android:directBootAware="true"
-            android:exported="false"/>
+            android:exported="false" />
 
         <service
             android:name=".alarms.AlarmService"
-            android:foregroundServiceType="mediaPlayback"
-            android:directBootAware="true" />
+            android:directBootAware="true"
+            android:enabled="true"
+            android:foregroundServiceType="mediaPlayback" />
 
         <receiver
             android:name=".alarms.AlarmStateManager"
-            android:foregroundServiceType="mediaPlayback"
-            android:directBootAware="true" />
+            android:directBootAware="true"
+            android:enabled="true"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <receiver
+            android:name=".AlarmInitReceiver"
+            android:exported="true"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
-
-
 
 </manifest>
