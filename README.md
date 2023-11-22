@@ -6,8 +6,7 @@ This is an alarm app
 - UI: Material 3, Stateflow
 - Controller: ViewModel
 # images
-
-![alt text](envidences/1.png "Evidence 1")
+<img src="envidences/1.png" alt="drawing" height="300"/>
 
 # resources
 - [AOSP Alarm App](https://cs.android.com/android/platform/superproject/main/+/main:packages/apps/DeskClock/)
