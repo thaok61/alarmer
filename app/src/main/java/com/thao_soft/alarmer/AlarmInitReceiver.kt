@@ -1,6 +1,5 @@
 package com.thao_soft.alarmer
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,6 +8,8 @@ import com.thao_soft.alarmer.AlarmAlertWakeLock.createPartialWakeLock
 import com.thao_soft.alarmer.alarms.AlarmStateManager
 import com.thao_soft.alarmer.alarms.goAsync
 import com.thao_soft.alarmer.data.DataModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AlarmInitReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) = goAsync {
@@ -19,7 +20,9 @@ class AlarmInitReceiver : BroadcastReceiver() {
         wl.acquire(10 * 60 * 1000L /*10 minutes*/)
 
         // We need to increment the global id out of the async task to prevent race conditions
-        DataModel.dataModel.updateGlobalIntentId()
+        withContext(Dispatchers.Main) {
+            DataModel.dataModel.updateGlobalIntentId()
+        }
 
 
         // Process restored data if any exists
@@ -32,12 +35,6 @@ class AlarmInitReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        /**
-         * When running on N devices, we're interested in the boot completed event that is sent
-         * while the user is still locked, so that we can schedule alarms.
-         */
-        @SuppressLint("InlinedApi")
-        private val ACTION_BOOT_COMPLETED = Intent.ACTION_LOCKED_BOOT_COMPLETED
 
 
         const val TAG: String = "AlarmInitReceiver"
